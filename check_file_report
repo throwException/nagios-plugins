@@ -22,7 +22,7 @@ def parse_int(intstring):
 
 if len(sys.argv) != 4:
 	print 'CRITICAL - Input error, usage: ./check_file_report <file> <warn_secs> <crit_secs>'
-	sys.exit(0);
+	sys.exit(2);
 
 filename = sys.argv[1]
 warn_seconds =  parse_int(sys.argv[2])
@@ -30,22 +30,22 @@ crit_seconds =  parse_int(sys.argv[3])
 
 if warn_seconds < 1:
 	print 'CRITICAL - Input error: Warning seconds must be numeric and greater 0.'
-	sys.exit(0);
+	sys.exit(2);
 
 if crit_seconds < 1:
 	print 'CRITICAL - Input error: Critical seconds must be numeric and creater 0.'
-	sys.exit(0);
+	sys.exit(2);
 
 if not os.path.isfile(filename):
 	print 'CRITICAL - Input error: File not found.'
-	sys.exit(0);
+	sys.exit(2);
 
 with open(filename) as f:
 	lines = f.readlines()
 
 if len(lines) != 3:
 	print 'CRITICAL - Input error: File does not have two lines.'
-	sys.exit(0);
+	sys.exit(2);
 
 report_time = parse_datetime(trim(lines[0]), datetime.datetime(2000, 1, 1))
 now = datetime.datetime.now()
@@ -54,24 +54,24 @@ report_detail = trim(lines[2]);
 
 if now > (report_time + datetime.timedelta(seconds=crit_seconds)):
 	print 'CRITICAL - Critical time expired.'
-	sys.exit(0);
+	sys.exit(2);
 
 if report_status == 'CRITICAL':
 	print 'CRITICAL - Report status is critical. Report detail: ' + report_detail
-	sys.exit(0);
+	sys.exit(2);
 
 if now > (report_time + datetime.timedelta(seconds=warn_seconds)):
 	print 'WARNING - Warning time expired. Report detail: ' + report_detail
-	sys.exit(0);
+	sys.exit(1);
 
 if report_status == 'WARNING':
 	print 'WARNING - Report status is warning. Report detail: ' + report_detail
-	sys.exit(0);
+	sys.exit(1);
  
 if report_status == 'OK':
 	print 'OK - Report status is OK. Report detail: ' + report_detail
 	sys.exit(0);
  
 print 'UNKNOWN - Report status is unknown. Report detail: ' + report_detail
-sys.exit(0);
+sys.exit(3);
 
